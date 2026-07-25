@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Victorian Food Premises Assessment Guide</title>
+  <style>
+    :root{
+      --bg:#f4f7f6; --card:#ffffff; --ink:#19302b; --muted:#62736e;
+      --brand:#146c5a; --brand2:#0d4f42; --line:#d7e2df;
+      --good:#e7f6ee; --warn:#fff4d8; --bad:#fde7e7; --info:#e8f1fb;
+      --shadow:0 8px 24px rgba(20,55,48,.08);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.45}
+    header{background:linear-gradient(135deg,var(--brand2),var(--brand));color:white;padding:28px 20px}
+    header .wrap,.wrap{max-width:1100px;margin:auto}
+    h1{margin:0 0 6px;font-size:clamp(1.6rem,4vw,2.5rem)}
+    h2{margin-top:0}.sub{opacity:.9;max-width:850px}
+    .toolbar{position:sticky;top:0;z-index:20;background:rgba(244,247,246,.96);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:10px}
+    .toolbar-inner{max-width:1100px;margin:auto;display:flex;gap:8px;flex-wrap:wrap}
+    button,select,input,textarea{font:inherit}
+    button,.btn{border:0;border-radius:8px;padding:10px 14px;cursor:pointer;background:var(--brand);color:white;font-weight:650}
+    button.secondary{background:white;color:var(--brand2);border:1px solid var(--line)}
+    button.danger{background:#9d2b2b}
+    main{padding:22px 14px 60px}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+    .card{grid-column:span 12;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:var(--shadow)}
+    .half{grid-column:span 6}.third{grid-column:span 4}
+    @media(max-width:760px){.half,.third{grid-column:span 12}}
+    label{font-weight:650;display:block;margin:9px 0 5px}
+    input[type=text],input[type=date],select,textarea{width:100%;padding:10px;border:1px solid #bccdc8;border-radius:8px;background:white}
+    textarea{min-height:95px;resize:vertical}
+    .classification{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    @media(max-width:760px){.classification{grid-template-columns:1fr 1fr}}
+    .class-choice{border:2px solid var(--line);border-radius:10px;padding:12px;background:#fff;cursor:pointer}
+    .class-choice.active{border-color:var(--brand);background:#eef8f5}
+    .class-choice strong{display:block;font-size:1.1rem}
+    details{border:1px solid var(--line);border-radius:10px;margin:10px 0;background:white}
+    summary{cursor:pointer;padding:14px;font-weight:750}
+    details[open] summary{border-bottom:1px solid var(--line);background:#f7faf9}
+    .inside{padding:10px 14px 14px}
+    .check{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:9px 0;border-bottom:1px dashed #dfe8e5}
+    .check:last-child{border-bottom:0}
+    .check input[type=checkbox]{width:19px;height:19px;margin-top:2px}
+    .status{border-radius:999px;padding:3px 8px;font-size:.76rem;font-weight:750}
+    .critical{background:var(--bad);color:#842525}.major{background:var(--warn);color:#745500}.routine{background:var(--good);color:#1d6546}
+    .callout{padding:12px;border-radius:9px;margin:10px 0;background:var(--info);border-left:4px solid #3676af}
+    .red{background:var(--bad);border-left-color:#b53232}.amber{background:var(--warn);border-left-color:#b88700}.green{background:var(--good);border-left-color:#2c8b5d}
+    .hidden{display:none!important}
+    .progress{height:13px;background:#dce8e4;border-radius:999px;overflow:hidden}
+    .progress>div{height:100%;width:0;background:var(--brand);transition:.2s}
+    .score{font-size:1.8rem;font-weight:800;margin-top:5px}
+    .small{font-size:.9rem;color:var(--muted)}
+    .special-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+    @media(max-width:600px){.special-grid{grid-template-columns:1fr}}
+    .special-toggle{display:flex;gap:9px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:9px}
+    .summary-box{white-space:pre-wrap;background:#f8faf9;border:1px solid var(--line);padding:14px;border-radius:10px;min-height:100px}
+    footer{max-width:1100px;margin:0 auto;padding:0 14px 30px;color:var(--muted);font-size:.85rem}
+    @media print{
+      .toolbar,.no-print,button{display:none!important}
+      body{background:white;font-size:10pt}.card{box-shadow:none;break-inside:avoid}
+      details{break-inside:avoid}details:not([open]) .inside{display:block!important}
+      header{padding:15px;background:white;color:black;border-bottom:2px solid black}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Food Premises Assessment Guide</h1>
+    <div class="sub">Interactive field checklist for Victorian local-government Environmental Health Officers. Select the premises class and special processes to reveal relevant checks.</div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <button onclick="saveInspection()">Save locally</button>
+    <button class="secondary" onclick="generateSummary()">Generate summary</button>
+    <button class="secondary" onclick="window.print()">Print / PDF</button>
+    <button class="danger" onclick="resetInspection()">Reset</button>
+  </div>
+</div>
+
+<main class="wrap">
+  <div class="grid">
+    <section class="card">
+      <h2>1. Inspection details</h2>
+      <div class="grid">
+        <div class="half"><label>Business / premises</label><input id="business" type="text"></div>
+        <div class="half"><label>Address</label><input id="address" type="text"></div>
+        <div class="third"><label>Inspection date</label><input id="date" type="date"></div>
+        <div class="third"><label>Officer</label><input id="officer" type="text"></div>
+        <div class="third"><label>Inspection type</label>
+          <select id="inspectionType">
+            <option>Routine assessment</option><option>Follow-up</option><option>Complaint investigation</option>
+            <option>Pre-registration / fit-out</option><option>Foodborne illness investigation</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>2. Premises classification</h2>
+      <p class="small">Choose the council classification recorded for the premises. Classification depends on the food handled and vulnerable populations served.</p>
+      <div class="classification">
+        <div class="class-choice" data-class="1" onclick="setClass('1')"><strong>Class 1</strong><span>Highest-risk services, generally vulnerable people.</span></div>
+        <div class="class-choice" data-class="2" onclick="setClass('2')"><strong>Class 2</strong><span>Most restaurants, cafés, takeaways and caterers handling unpackaged PHF.</span></div>
+        <div class="class-choice" data-class="3" onclick="setClass('3')"><strong>Class 3 / 3A</strong><span>Lower-risk activities; confirm exact subclass and obligations.</span></div>
+        <div class="class-choice" data-class="4" onclick="setClass('4')"><strong>Class 4</strong><span>Lowest-risk food activities; notification generally applies.</span></div>
+      </div>
+      <div id="classAdvice" class="callout hidden"></div>
+    </section>
+
+    <section class="card">
+      <h2>3. Special processes and menu risks</h2>
+      <div class="special-grid">
+        <label class="special-toggle"><input type="checkbox" data-special="sushi"> Sushi, sashimi or acidified rice</label>
+        <label class="special-toggle"><input type="checkbox" data-special="rawegg"> Raw or lightly cooked egg / aioli</label>
+        <label class="special-toggle"><input type="checkbox" data-special="cooling"> Cook–cool–reheat</label>
+        <label class="special-toggle"><input type="checkbox" data-special="vacuum"> Vacuum packing / sous vide / reduced oxygen</label>
+        <label class="special-toggle"><input type="checkbox" data-special="allergen"> Complex allergen orders or claims</label>
+        <label class="special-toggle"><input type="checkbox" data-special="delivery"> Off-site catering or delivery</label>
+        <label class="special-toggle"><input type="checkbox" data-special="buffet"> Buffet, self-service or display</label>
+        <label class="special-toggle"><input type="checkbox" data-special="sprouts"> Raw sprouts or ready-to-eat produce</label>
+      </div>
+    </section>
+
+    <section class="card half">
+      <h2>Progress</h2>
+      <div class="progress"><div id="progressBar"></div></div>
+      <div class="score"><span id="completed">0</span>/<span id="total">0</span></div>
+      <div class="small">Checks completed. A tick records that the item was assessed, not necessarily compliant.</div>
+    </section>
+    <section class="card half">
+      <h2>Immediate escalation prompts</h2>
+      <div class="callout red"><strong>Consider immediate action:</strong> unsafe food offered for sale, sewage contamination, no potable water, uncontrolled pests, gross insanitary conditions, serious allergen risk, suspected outbreak, or inability to maintain temperature control.</div>
+    </section>
+
+    <section class="card" id="checklist">
+      <h2>4. Systematic inspection checklist</h2>
+
+      <details open>
+        <summary>A. Entry, scope and records</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Confirm proprietor/person in charge, explain purpose and scope, and record who is present.</span><span class="status routine">Routine</span></div>
+          <div class="check"><input type="checkbox"><span>Verify registration/notification details, classification, activities, trading name and ownership.</span><span class="status major">Major</span></div>
+          <div class="check class-1 class-2 class-3"><input type="checkbox"><span>Verify food safety supervisor requirements and evidence of current competency where applicable.</span><span class="status major">Major</span></div>
+          <div class="check class-1 class-2"><input type="checkbox"><span>Confirm required food safety program or minimum records are available, current and used in practice.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Review previous non-compliances, complaints, sampling results and outstanding actions.</span><span class="status routine">Routine</span></div>
+          <div class="check class-1 class-2"><input type="checkbox"><span>Assess Standard 3.2.2A applicability: trained food handlers, food safety supervisor and substantiation/evidence requirements.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>B. Receiving and approved suppliers</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Food is obtained from identifiable, lawful and suitable suppliers; invoices or traceability information are available.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Potentially hazardous food is received at safe temperature and protected from contamination.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Packaging is intact; food is within use-by date; no swollen, leaking, damaged or contaminated containers.</span><span class="status major">Major</span></div>
+          <div class="check special-delivery hidden"><input type="checkbox"><span>Delivery vehicles, transport containers and handover procedures maintain temperature and prevent contamination.</span><span class="status critical">Critical</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>C. Storage and temperature control</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Cold potentially hazardous food is maintained at 5°C or below, unless another safe control is demonstrated.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Hot potentially hazardous food is maintained at 60°C or above, unless another safe control is demonstrated.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Frozen food remains frozen; thawing is controlled and does not contaminate other food.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Raw food is separated from ready-to-eat food; food is covered, labelled and stored off the floor.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Date marking, stock rotation and use-by controls are effective.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Probe thermometer is available, accurate, clean and sanitised between uses.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>D. Food processing and contamination control</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Preparation workflow prevents cross-contamination between raw and ready-to-eat foods.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Cooking process achieves a safe outcome and staff can demonstrate how it is verified.</span><span class="status critical">Critical</span></div>
+          <div class="check special-cooling hidden"><input type="checkbox"><span>Cooling: from 60°C to 21°C within 2 hours, then 21°C to 5°C within a further 4 hours, or an equally safe validated process.</span><span class="status critical">Critical</span></div>
+          <div class="check special-cooling hidden"><input type="checkbox"><span>Reheating is rapid and food is not repeatedly cooled and reheated without effective control.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Time as a control is documented and staff understand the applicable 2-hour/4-hour decision points.</span><span class="status critical">Critical</span></div>
+          <div class="check special-vacuum hidden"><input type="checkbox"><span>Reduced-oxygen process has validated controls for time, temperature, shelf life, pathogens and package integrity.</span><span class="status critical">Critical</span></div>
+          <div class="check special-sprouts hidden"><input type="checkbox"><span>Raw sprouts and ready-to-eat produce have suitable supplier assurance, washing and contamination controls.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details class="special-sushi hidden">
+        <summary>E. Sushi and sashimi controls</summary>
+        <div class="inside">
+          <div class="callout amber">Check the business’s documented process and council-approved food safety program/template. Acidified rice control must be measurable and consistently recorded.</div>
+          <div class="check"><input type="checkbox"><span>Sushi rice recipe is standardised; vinegar/acid quantity, batch size, mixing method and holding period are controlled.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Each batch is checked using a suitable calibrated pH method; records demonstrate the validated critical limit is met.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Raw seafood is sourced from approved suppliers, traceable, protected and kept under effective temperature control.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Separate utensils, boards, gloves/handwashing and display practices prevent contamination.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Display time and disposal rules are documented and followed; leftover displayed sushi is not inappropriately retained.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Parasite controls and supplier assurances are considered for fish intended to be eaten raw.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details class="special-rawegg hidden">
+        <summary>F. Raw egg, mayonnaise and aioli</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Pasteurised egg product is used where practicable, particularly for uncooked sauces and desserts.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Only clean, uncracked eggs are used; dirty or cracked eggs are discarded and shells do not contact food.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Raw egg product is prepared in small batches using sanitised equipment and protected from cross-contamination.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Product is kept at 5°C or below, date/time labelled, not topped up, and discarded within the business’s validated short shelf life.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Staff understand higher risk to vulnerable people and the business avoids serving unsafe raw egg foods to these groups.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>G. Personal hygiene and handwashing</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Dedicated handwash basin is accessible, unobstructed and supplied with warm running water, soap and single-use towels.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Food handlers wash hands at appropriate times and do not use food or utensil sinks for handwashing.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Illness reporting and exclusion procedures cover vomiting, diarrhoea and other foodborne illness symptoms.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Clothing, wounds, gloves and personal behaviour do not create contamination risk.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>H. Cleaning, sanitising and equipment</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Food-contact surfaces are clean, smooth, impervious and in good repair.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Cleaning and sanitising are separate, effective steps; chemical concentration/contact time or heat process is correct.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Dishwasher/glasswasher operation is suitable and monitored; manual washing setup is adequate where used.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Cleaning cloths, brushes and chemicals are stored and used to prevent contamination.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Equipment is accessible for cleaning; seals, blades, slicers, ice machines and hard-to-reach areas are satisfactory.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>I. Premises, pests, waste and utilities</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Floors, walls, ceilings, fixtures, lighting and ventilation are suitable, clean and maintained.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>No evidence of rodents, cockroaches, flies or other pests; entry points and harbourage are controlled.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Waste is contained and removed without attracting pests or contaminating food areas.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Adequate potable water, hot water, sewage disposal and drainage are available and operating.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Toilets and staff facilities are suitable and do not open directly into food preparation areas without appropriate separation.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+
+      <details class="special-allergen hidden">
+        <summary>J. Allergen management</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Staff can accurately identify ingredients and mandatory allergens in menu items.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Allergen orders are clearly communicated from customer to kitchen and through service.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Cross-contact controls cover hands, benches, utensils, fryers, grills, storage and garnishes.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Packaged food labels and menu claims are accurate; staff do not make unsupported “allergen-free” assurances.</span><span class="status critical">Critical</span></div>
+        </div>
+      </details>
+
+      <details class="special-buffet hidden">
+        <summary>K. Buffet and self-service</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Food is protected by covers, guards, supervision and suitable utensils.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Hot/cold holding or documented time control is effective and verified.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Contaminated or returned food is discarded and serving utensils are replaced appropriately.</span><span class="status critical">Critical</span></div>
+        </div>
+      </details>
+
+      <details>
+        <summary>L. Closing discussion and enforcement decision</summary>
+        <div class="inside">
+          <div class="check"><input type="checkbox"><span>Discuss findings with proprietor/person in charge and verify their understanding.</span><span class="status routine">Routine</span></div>
+          <div class="check"><input type="checkbox"><span>For each non-compliance, record evidence, risk, legislative basis, required action and due date.</span><span class="status major">Major</span></div>
+          <div class="check"><input type="checkbox"><span>Apply proportionate enforcement in accordance with council policy, procedural fairness and immediate public-health risk.</span><span class="status critical">Critical</span></div>
+          <div class="check"><input type="checkbox"><span>Arrange follow-up, sampling, referral, seizure/disposal or escalation where required.</span><span class="status major">Major</span></div>
+        </div>
+      </details>
+    </section>
+
+    <section class="card">
+      <h2>5. Findings and action plan</h2>
+      <label>Critical / immediate risks</label><textarea id="criticalNotes" placeholder="Record food, temperature, location, evidence, action taken and person advised."></textarea>
+      <label>Other non-compliances</label><textarea id="otherNotes"></textarea>
+      <label>Corrective actions and due dates</label><textarea id="actions"></textarea>
+      <label>Positive practices / education provided</label><textarea id="positives"></textarea>
+      <label>Proposed outcome</label>
+      <select id="outcome">
+        <option>No further action</option><option>Education / verbal advice</option><option>Written corrective actions</option>
+        <option>Follow-up inspection</option><option>Improvement notice / statutory action considered</option>
+        <option>Immediate escalation / closure considerations</option><option>Sampling or further investigation</option>
+      </select>
+    </section>
+
+    <section class="card">
+      <h2>6. Generated inspection summary</h2>
+      <div id="summaryOutput" class="summary-box">Select “Generate summary” when the inspection is complete.</div>
+      <button class="secondary no-print" style="margin-top:10px" onclick="copySummary()">Copy summary</button>
+    </section>
+
+    <section class="card">
+      <h2>Reference notes</h2>
+      <div class="callout">
+        This is a practical prompt, not a substitute for the Food Act 1984 (Vic), Australia New Zealand Food Standards Code, council procedures, authorised-officer powers, current Department of Health guidance or the premises-specific food safety program.
+      </div>
+      <ul>
+        <li>Potentially hazardous food generally requires temperature control at 5°C or below or 60°C or above, unless another safe process is demonstrated.</li>
+        <li>Standard 3.2.2A may require a food safety supervisor, food-handler training and evidence that critical controls are being managed.</li>
+        <li>Raw egg foods and sushi require close examination of documented recipes, time/temperature controls, verification records and staff practice.</li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Built as an interview and field-support tool for Victorian local government. Confirm all enforcement decisions and classification requirements against current legislation, departmental guidance and council policy.
+</footer>
+
+<script>
+  let selectedClass = "";
+  const allChecks = () => [...document.querySelectorAll('.check:not(.hidden) input[type=checkbox]')];
+
+  function setClass(cls){
+    selectedClass = cls;
+    document.querySelectorAll('.class-choice').forEach(x=>x.classList.toggle('active',x.dataset.class===cls));
+    document.querySelectorAll('[class*="class-"]').forEach(el=>{
+      const applicable = el.classList.contains('class-'+cls);
+      el.classList.toggle('hidden',!applicable);
+    });
+    const advice = {
+      '1':'Class 1: confirm vulnerable-person service, food safety program/audit arrangements, food safety supervisor and all high-risk controls.',
+      '2':'Class 2: conduct a full risk-based assessment. Confirm food safety supervisor, applicable program/records and Standard 3.2.2A tools.',
+      '3':'Class 3 / 3A: confirm the exact subclass and permitted activities. Focus assessment on the food processes actually undertaken and applicable records.',
+      '4':'Class 4: verify the activity remains within the low-risk classification and that notification details and basic hygiene controls are satisfactory.'
+    };
+    const box=document.getElementById('classAdvice');
+    box.textContent=advice[cls]; box.classList.remove('hidden');
+    updateProgress();
+  }
+
+  document.querySelectorAll('[data-special]').forEach(cb=>{
+    cb.addEventListener('change',()=>{
+      const key=cb.dataset.special;
+      document.querySelectorAll('.special-'+key).forEach(el=>el.classList.toggle('hidden',!cb.checked));
+      updateProgress();
+    });
+  });
+
+  document.addEventListener('change',e=>{
+    if(e.target.matches('input,textarea,select')) updateProgress();
+  });
+
+  function updateProgress(){
+    const checks=allChecks(), done=checks.filter(x=>x.checked).length;
+    document.getElementById('completed').textContent=done;
+    document.getElementById('total').textContent=checks.length;
+    document.getElementById('progressBar').style.width=(checks.length?done/checks.length*100:0)+'%';
+  }
+
+  function formData(){
+    const specials=[...document.querySelectorAll('[data-special]:checked')].map(x=>x.parentElement.textContent.trim());
+    return {
+      selectedClass,
+      fields:Object.fromEntries([...document.querySelectorAll('input[type=text],input[type=date],textarea,select')].map(x=>[x.id,x.value])),
+      specials,
+      specialState:Object.fromEntries([...document.querySelectorAll('[data-special]')].map(x=>[x.dataset.special,x.checked])),
+      checks:[...document.querySelectorAll('.check input[type=checkbox]')].map(x=>x.checked)
+    };
+  }
+
+  function saveInspection(){
+    localStorage.setItem('vicFoodInspectionGuide',JSON.stringify(formData()));
+    alert('Inspection saved in this browser.');
+  }
+
+  function loadInspection(){
+    const raw=localStorage.getItem('vicFoodInspectionGuide'); if(!raw){updateProgress();return}
+    try{
+      const d=JSON.parse(raw);
+      if(d.selectedClass)setClass(d.selectedClass);
+      Object.entries(d.fields||{}).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.value=val});
+      Object.entries(d.specialState||{}).forEach(([key,val])=>{const el=document.querySelector('[data-special="'+key+'"]');if(el){el.checked=val;el.dispatchEvent(new Event('change'))}});
+      document.querySelectorAll('.check input[type=checkbox]').forEach((x,i)=>x.checked=!!(d.checks||[])[i]);
+    }catch(e){console.warn(e)}
+    updateProgress();
+  }
+
+  function generateSummary(){
+    const f=formData().fields;
+    const checked=allChecks(), completed=checked.filter(x=>x.checked).length;
+    const text =
+`FOOD PREMISES ASSESSMENT SUMMARY
+Premises: ${f.business||'—'}
+Address: ${f.address||'—'}
+Date: ${f.date||'—'}
+Officer: ${f.officer||'—'}
+Inspection type: ${f.inspectionType||'—'}
+Premises class: ${selectedClass||'Not selected'}
+Special processes: ${formData().specials.join(', ')||'None selected'}
+Checklist reviewed: ${completed}/${checked.length}
+
+Critical / immediate risks:
+${f.criticalNotes||'None recorded.'}
+
+Other non-compliances:
+${f.otherNotes||'None recorded.'}
+
+Corrective actions and due dates:
+${f.actions||'None recorded.'}
+
+Positive practices / education:
+${f.positives||'None recorded.'}
+
+Proposed outcome:
+${f.outcome||'—'}
+
+Note: Final findings and enforcement decisions must be documented in the council’s authorised system and assessed against current legislation, policy and evidence.`;
+    document.getElementById('summaryOutput').textContent=text;
+  }
+
+  async function copySummary(){
+    const text=document.getElementById('summaryOutput').textContent;
+    try{await navigator.clipboard.writeText(text);alert('Summary copied.')}
+    catch(e){alert('Copy failed. Select the summary text manually.')}
+  }
+
+  function resetInspection(){
+    if(!confirm('Clear all inspection data?'))return;
+    localStorage.removeItem('vicFoodInspectionGuide');
+    location.reload();
+  }
+
+  loadInspection();
+</script>
+</body>
+</html>
